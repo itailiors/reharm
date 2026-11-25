@@ -21,11 +21,13 @@ Nothing. LIVE at https://itailiors.github.io/reharm/ (repo made public 2026-11-2
 - 0418492 — share card ships as og-image.jpg (74 KB, q88 JPEG of the 851 KB og-image.png master). If the art changes, re-export the JPEG from the PNG.
 - Live share flow checked 2026-11-25 (in-app browser): fill → Lock Mix → Share card links to itailiors.github.io/reharm/#1:…; the link opens the receiver (spoiler-safe, A/B) with no console errors.
 - Discord link preview confirmed by user 2026-11-25 (title, description, card image). iMessage/WhatsApp not checked.
+- c47f978 — badge pins ship as 132px exports in assets/badges/web/ (2.8 MB → 150 KB; masters kept); manifest.webmanifest + icons/ (192, 512, maskable) + robots.txt emitted by the vite staticFiles plugin; PNG favicon, twitter:image, og:image size/alt, og:site_name.
+- e8a3596 — playtest fixes: locked note in Piano mode, invalid share-link notice shown after the gate (gateNotice), BPM chip stacks ≤420px / hidden ≤360px, piano readout wraps on phones, pin hint no longer shifts Stats, How to Play says "Anchor" not "brass-locked".
 
 ## Next 3 steps
 1. Housekeeping: bump configure-pages/deploy-pages when Node 24 versions ship (runs warn about Node 20).
 2. Tune the percentile curve once there is real player data.
-3. Optional: check WhatsApp/iMessage previews when convenient.
+3. Playtest leftovers (product calls): share URL shows chords in plain text (copy says "safe to paste"); score reasons are jazz-jargon heavy; 4 dots on bar cards unlabelled; chord names truncate at 320px; empty gap above the bottom-anchored drawer on tall phones.
 
 ## TODO (parked)
 - Real-iPhone test with the silent switch on via the live URL (audioSession + silent loop + Tone.start path); the only untested area. User has no iPhone; parked until one is available.
