@@ -16,14 +16,19 @@ Production REHARM daily web game (Vite + vanilla TS + Tone.js), built strictly f
 - `tests/solver.ts` = brute-force helpers for bank checks.
 
 ## In progress
-Nothing. LIVE at https://itailiors.github.io/reharm/ (repo made public 2026-11-25, Pages source = GitHub Actions; every push to main redeploys). First deploy run 45671548615 green; absolute og tags and og-image.png (200) checked live.
+Nothing. LIVE at https://itailiors.github.io/reharm/ (repo made public 2026-11-25, Pages source = GitHub Actions; every push to main redeploys).
 
-- Live share flow checked 2026-11-25 (in-app browser): fill → Lock Mix → Share card links to itailiors.github.io/reharm/#1:…; opening that link shows the receiver (spoiler-safe, A/B) with no console errors. Live og/twitter tags complete; og-image.png served as image/png.
+- 0418492 — share card ships as og-image.jpg (74 KB, q88 JPEG of the 851 KB og-image.png master). If the art changes, re-export the JPEG from the PNG.
+- Live share flow checked 2026-11-25 (in-app browser): fill → Lock Mix → Share card links to itailiors.github.io/reharm/#1:…; the link opens the receiver (spoiler-safe, A/B) with no console errors.
+- Discord link preview confirmed by user 2026-11-25 (title, description, card image). iMessage/WhatsApp not checked.
 
 ## Next 3 steps
-1. Test on a real iPhone with the silent switch on via the live URL (audioSession + silent loop + Tone.start path); the only untested area. Also paste the URL into iMessage/Discord/WhatsApp to see the real preview (can't be checked from here).
-2. Share card now ships as og-image.jpg (74 KB, q88 JPEG of the 851 KB og-image.png master) so WhatsApp previews it. If the art changes, re-export the JPEG from the PNG.
-3. Housekeeping: bump configure-pages/deploy-pages when Node 24 versions ship (runs warn about Node 20); tune the percentile curve with real data later.
+1. Housekeeping: bump configure-pages/deploy-pages when Node 24 versions ship (runs warn about Node 20).
+2. Tune the percentile curve once there is real player data.
+3. Optional: check WhatsApp/iMessage previews when convenient.
+
+## TODO (parked)
+- Real-iPhone test with the silent switch on via the live URL (audioSession + silent loop + Tone.start path); the only untested area. User has no iPhone; parked until one is available.
 
 ## Decisions + why
 - Vanilla TS over React: smallest bundle for mobile Safari (JS 94 KB gz, mostly Tone).
