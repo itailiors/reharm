@@ -2,6 +2,7 @@ import type { BadgeId, SpiceTier, UnlockedBadge } from '../types';
 import { BADGE_IDS } from '../types';
 import { BADGE_META, type FullScore, tierForTotal } from '../theory';
 import { buildSharePayload } from '../share/card';
+import { DAILY_SHARE_URL, LAB_CHANGES_URL } from '../share/daily';
 import { $, $$, copyText, esc, prefersReducedMotion } from './dom';
 import { BADGE_PNG, BADGE_SVG, ICONS } from './assets';
 import type { ReharmApp } from './app';
@@ -132,7 +133,15 @@ export class Modals {
         <button class="cta-primary" type="button" id="btn-reveal-share">${ICONS.share} Share Mix</button>
         <button class="hw-btn" type="button" id="btn-reveal-replay">${ICONS.play} Replay Mix</button>
         <button class="hw-btn" type="button" id="btn-reveal-stats">${ICONS.stats} View Stats</button>
-      </div>`);
+      </div>
+      <aside class="daily-next-card" aria-label="Next daily puzzle">
+        <div class="daily-next-info">
+          <span class="daily-next-eyebrow">Today’s Sheet</span>
+          <strong class="daily-next-title">All daily puzzles complete</strong>
+          <a class="daily-next-practice" href="${LAB_CHANGES_URL}">Practice: Make the Changes ↗</a>
+        </div>
+        <a class="daily-next-cta" href="${DAILY_SHARE_URL}">Share Combined Card →</a>
+      </aside>`);
 
     $('#btn-reveal-share', el).addEventListener('click', () => this.openShare(score));
     $('#btn-reveal-stats', el).addEventListener('click', () => this.openStats());

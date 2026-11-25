@@ -367,3 +367,176 @@ button.trophy-cell {
 [data-reduced-motion="true"] .badge-item.anim-stamp {
   animation: none !important;
 }
+
+/* =========================================================================
+   Reharm Daily bridge (ReharmLab-Dailys/design/bridge-spec.md §2)
+   ========================================================================= */
+[data-theme="dark"] {
+  --bridge-bg: #16181D;
+  --bridge-surface: #191B20;
+  --bridge-elevated: #22252C;
+  --bridge-border: #2B2F3A;
+  --bridge-text: #F4F1EA;
+  --bridge-muted: #B2B6C2;
+  --bridge-accent: #E8A849;
+  --bridge-accent-ink: #14120E;
+}
+
+[data-theme="light"] {
+  --bridge-bg: var(--bg-canvas);
+  --bridge-surface: var(--bg-surface);
+  --bridge-elevated: var(--bg-elevated);
+  --bridge-border: var(--border-subtle);
+  --bridge-text: var(--text-primary);
+  --bridge-muted: var(--text-secondary);
+  --bridge-accent: var(--accent-primary);
+  --bridge-accent-ink: var(--accent-primary-ink);
+}
+
+:root {
+  --bridge-font: var(--font-sans);
+  --bridge-mono: var(--font-mono);
+}
+
+.daily-bridge-bar {
+  flex: none;
+  height: 38px;
+  /* Flush with the top of the shell; the header's own gap still separates it. */
+  margin: -10px -12px -4px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bridge-bg);
+  border-bottom: 1px solid var(--bridge-border);
+  font-family: var(--bridge-font);
+  font-size: 12.5px;
+}
+
+@media (min-width: 768px) {
+  .daily-bridge-bar {
+    margin: -20px -28px -2px;
+    padding: 0 28px;
+  }
+}
+
+.daily-bridge-bar a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+/* 44px hit area without growing the 38px strip. */
+.daily-bridge-bar a::before {
+  content: '';
+  position: absolute;
+  inset: -3px -6px;
+}
+
+.daily-bridge-bar a:focus-visible {
+  outline: 2px solid var(--bridge-accent);
+  outline-offset: -4px;
+}
+
+.daily-back-link {
+  color: var(--bridge-accent);
+  font-weight: 600;
+}
+
+.daily-back-link:hover {
+  text-decoration: underline;
+}
+
+.daily-ritual-mini {
+  color: var(--bridge-muted);
+  font-family: var(--bridge-mono);
+  font-size: 11px;
+}
+
+.daily-mini-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.daily-mini-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--bridge-muted);
+}
+
+.daily-mini-dots i.is-done {
+  background: var(--bridge-accent);
+  border-color: var(--bridge-accent);
+}
+
+.daily-next-card {
+  margin-top: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--bridge-elevated);
+  border: 1px solid var(--bridge-border);
+  border-radius: var(--radius-lg);
+  font-family: var(--bridge-font);
+}
+
+.daily-next-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.daily-next-eyebrow {
+  font-family: var(--bridge-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bridge-muted);
+}
+
+.daily-next-title {
+  color: var(--bridge-text);
+  font-size: 14px;
+}
+
+.daily-next-practice {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: var(--bridge-muted);
+  font-size: 12.5px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.daily-next-practice:hover {
+  color: var(--bridge-text);
+}
+
+.daily-next-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  background: var(--bridge-accent);
+  color: var(--bridge-accent-ink);
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.daily-next-cta:focus-visible {
+  outline: 2px solid var(--bridge-text);
+  outline-offset: 2px;
+}

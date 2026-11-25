@@ -1,5 +1,6 @@
 import type { BadgeId, PlayerStats, SpiceTier, UserSettings } from '../types';
 import { BADGE_IDS } from '../types';
+import { DAILY_KEY, type DailyRecord, buildDoneRecord, buildProgressRecord, shouldReplace } from './daily';
 
 export interface HistoryEntry {
   puzzleNumber: number;
@@ -89,7 +90,20 @@ function write(kv: KV, key: string, value: unknown): void {
 }
 
 export class ReharmStore {
-  constructor(private readonly kv: KV) {}
+  constructor(
+    private readonly kv: KV,
+    private readonly now: () => Date = () => new Date(),
+  ) {}
+
+  /** The Reharm Daily hub record, if any (never throws). */
+  loadDaily(): Partial<DailyRecord> | null {
+    return read<Partial<DailyRecord> | null>(this.kv, DAILY_KEY, null);
+  }
+
+  /** Mirror today's state into `daily:v1:reharm` for the hub. Never touches `reharm:v1:*`. */
+  private emitDaily(next: DailyRecord): void {
+    if (shouldReplace(this.loadDaily(), next)) write(this.kv, DAILY_KEY, next);
+  }
 
   loadSettings(): UserSettings {
     const s = read<Partial<UserSettings>>(this.kv, K.settings, {});
@@ -116,6 +130,7 @@ export class ReharmStore {
     h[entry.puzzleNumber] = entry;
     write(this.kv, K.history, h);
     this.clearDraft();
+    this.emitDaily(buildDoneRecord(entry, computeStats(h, entry.puzzleNumber), this.now()));
     return entry;
   }
 
@@ -126,6 +141,10 @@ export class ReharmStore {
 
   saveDraft(d: DraftEntry): void {
     write(this.kv, K.draft, d);
+    if (this.getResult(d.puzzleNumber)) return;
+    const filled = d.symbols.filter((s) => typeof s === 'string' && s.length > 0).length;
+    const stats = computeStats(this.loadHistory(), d.puzzleNumber);
+    this.emitDaily(buildProgressRecord(d.puzzleNumber, filled, stats, this.now()));
   }
 
   clearDraft(): void {
