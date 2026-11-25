@@ -27,6 +27,23 @@ export interface Device {
   owners: number[];
 }
 
+/** One-line plain-English meaning of each device, shown next to the theory label for non-jazz players. */
+export const DEVICE_PLAIN: Record<DeviceKind, string> = {
+  'tritone-sub': 'a sneaky half-step slide home',
+  'backdoor-dominant': 'a soft back-door route home',
+  'chromatic-mediant': 'a cinematic colour shift',
+  'modal-borrow': 'a bittersweet chord borrowed from the minor key',
+  'ii-v': 'the classic jazz set-up',
+  'secondary-dominant': 'leans hard into the next chord',
+  'passing-diminished': 'a tense chromatic step up',
+  'deceptive-cadence': 'fakes going home, then swerves',
+  'authentic-cadence': 'the strongest pull back home',
+  'plagal-cadence': 'the gentle "amen" landing',
+  predominant: 'sets up the move home',
+};
+
+export const UNRESOLVED_PLAIN = 'an outside chord that never resolves';
+
 export const TIER_ORDER: readonly SpiceTier[] = ['radio-safe', 'jazz-standard', 'modal-interchange', 'deep-reharm'];
 export const tierRank = (t: SpiceTier): number => TIER_ORDER.indexOf(t);
 export const maxTier = (a: SpiceTier, b: SpiceTier): SpiceTier => (tierRank(a) >= tierRank(b) ? a : b);
@@ -125,6 +142,8 @@ export function devicesForPair(key: KeyContext, a: Chord, b: Chord, i: number, j
 export interface BarAnalysis {
   tier: SpiceTier;
   deviceLabel?: string;
+  /** Plain-English gloss of deviceLabel (see DEVICE_PLAIN). */
+  devicePlain?: string;
   /** Non-diatonic chord with no functional explanation (anti-cheese penalty). */
   unexplainedChromatic: boolean;
   /** Dominant that never resolves (anti-cheese penalty). */
@@ -157,20 +176,25 @@ export function analyzeProgression(key: KeyContext, chords: readonly (Chord | nu
     const dia = isDiatonic(key, c);
     let tier: SpiceTier = dia && c.type.intervals.length <= 3 ? 'radio-safe' : 'jazz-standard';
     let deviceLabel: string | undefined;
+    let devicePlain: string | undefined;
     let bestRank = -1;
     for (const d of owned) {
       if (tierRank(d.tier) > bestRank) {
         bestRank = tierRank(d.tier);
         tier = maxTier(tier, d.tier);
         deviceLabel = d.label;
+        devicePlain = DEVICE_PLAIN[d.kind];
       }
     }
     const resolvesOut = devices.some((d) => d.from === i && d.kind !== 'modal-borrow' && d.kind !== 'chromatic-mediant');
     const pending = !next;
     const unexplainedChromatic = !dia && involved.length === 0 && !pending;
     const unresolvedDominant = isDominant(c) && !resolvesOut && !pending && !unexplainedChromatic;
-    if (unexplainedChromatic) deviceLabel = 'Unresolved colour';
-    return { tier, deviceLabel, unexplainedChromatic, unresolvedDominant };
+    if (unexplainedChromatic) {
+      deviceLabel = 'Unresolved colour';
+      devicePlain = UNRESOLVED_PLAIN;
+    }
+    return { tier, deviceLabel, devicePlain, unexplainedChromatic, unresolvedDominant };
   });
   return { devices, bars };
 }

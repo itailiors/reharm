@@ -218,7 +218,7 @@ export class Receiver {
       const tier = s.friend.score.barTiers[i]!;
       const show = locked || s.peek;
       return `<div class="bar-slot"${locked ? ' data-slot-state="locked"' : ''} data-bar="${i}">
-        <div class="slot-top"><span class="slot-bar-num">${locked ? 'ANCHOR' : `BAR ${i + 1}`}</span>${locked ? `<span class="slot-lock-badge">${LOCK_SVG}</span>` : '<span class="beat-leds" aria-hidden="true">' + '<span class="beat-led"></span>'.repeat(4) + '</span>'}</div>
+        <div class="slot-top"><span class="slot-bar-num">${locked ? 'ANCHOR' : `BAR ${i + 1}`}</span>${locked ? `<span class="slot-lock-badge">${LOCK_SVG}</span>` : '<span class="beat-leds" aria-hidden="true" title="Beat lights: the bar\'s 4 beats, lit as it plays">' + '<span class="beat-led"></span>'.repeat(4) + '</span>'}</div>
         <div class="slot-center">${show ? `<span class="slot-chord">${esc(c.symbol)}</span>` : `<span class="spoiler-shutter">🔒 Hidden</span>`}</div>
         <div class="slot-bottom"><span class="tier-badge" data-tier="${tier}">${locked ? '🔒 Anchor' : TIER_LABEL[tier]}</span></div>
       </div>`;

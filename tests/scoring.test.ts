@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { BadgeId, BarIndex } from '../src/types';
 import { BADGE_IDS } from '../src/types';
 import {
-  type Chord, analyzeProgression, colorize, evaluateBar, makeChord, parseChord, percentileFor, rarityScore,
+  type Chord, DEVICE_PLAIN, analyzeProgression, colorize, evaluateBar, makeChord, parseChord, percentileFor, rarityScore,
   scoreProgression, suggestFixes, tierForTotal, typeBySuffix, barNotes, findClashes,
 } from '../src/theory';
 import { type BankEntry, PUZZLE_BANK, buildPuzzle, mulberry32 } from '../src/puzzles';
@@ -202,5 +202,19 @@ describe('live bar evaluation, colorize & suggestions', () => {
     expect(ev.state).toBe('legal');
     expect(ev.message).toContain('Db7#11');
     expect(ev.message).toMatch(/#11/);
+  });
+
+  it('explains functional devices in plain English for non-jazz players', () => {
+    const a = analyzeProgression(ctxFor(TRENCH).key, ['CMaj7', 'Dm7', 'G7', 'Db7'].map(C));
+    expect(a.bars[2]!.deviceLabel).toMatch(/Cadence|→/);
+    expect(a.bars[2]!.devicePlain).toBeTruthy();
+    const s = score(TRENCH, TRENCH_MIX);
+    expect(s.axisSummaries.rarity).toMatch(/ — (a sneaky half-step slide home|a cinematic colour shift)/);
+  });
+
+  it('every device kind has a plain-English gloss', () => {
+    const kinds = ['tritone-sub', 'backdoor-dominant', 'chromatic-mediant', 'modal-borrow', 'ii-v', 'secondary-dominant',
+      'passing-diminished', 'deceptive-cadence', 'authentic-cadence', 'plagal-cadence', 'predominant'] as const;
+    for (const k of kinds) expect(DEVICE_PLAIN[k].length).toBeGreaterThan(5);
   });
 });

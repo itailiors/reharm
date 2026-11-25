@@ -131,10 +131,28 @@ button.puzzle-pill.is-solved:hover {
   }
 }
 
-/* 320–360px phones: no room at all; BPM is still shown on the start screen. */
+/* 320–360px phones: no room at all; BPM is still shown on the start screen.
+   Chord names shrink and may wrap instead of truncating ("EbMa…"). */
 @media (max-width: 360px) {
   .bpm-readout {
     display: none;
+  }
+
+  /* Header: the logo mark stays; the wordmark would push the puzzle pill under the icon buttons. */
+  .brand-wordmark {
+    display: none;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .slot-chord {
+    font-size: 13px;
+    letter-spacing: -0.04em;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }
 

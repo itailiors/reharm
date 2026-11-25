@@ -25,6 +25,7 @@ export interface StudioBar {
   queued: Chord | null;
   tier?: SpiceTier;
   deviceLabel?: string;
+  devicePlain?: string;
   clashReason?: string;
   suggestions?: string[];
 }
@@ -305,6 +306,7 @@ export class ReharmApp implements ReharmVisualHooks {
       const a = analysis.bars[i];
       b.tier = a?.tier;
       b.deviceLabel = a?.deviceLabel;
+      b.devicePlain = a?.devicePlain;
     });
   }
 
@@ -617,7 +619,7 @@ export class ReharmApp implements ReharmVisualHooks {
     const shown = b.state === 'queued' ? b.queued : b.chord;
     const top = locked
       ? `<span class="slot-lock-badge" aria-label="Anchored">${LOCK_SVG}</span>`
-      : `<span class="beat-leds" aria-hidden="true">${'<span class="beat-led"></span>'.repeat(4)}</span>`;
+      : `<span class="beat-leds" aria-hidden="true" title="Beat lights: the bar's 4 beats, lit as it plays">${'<span class="beat-led"></span>'.repeat(4)}</span>`;
     const center = shown
       ? `<span class="slot-chord">${esc(shown.symbol)}</span><span class="slot-voicing-notes">${esc(chordToneNames(shown))}</span>`
       : `<span class="slot-empty-label">+ Chord</span>`;
@@ -625,7 +627,7 @@ export class ReharmApp implements ReharmVisualHooks {
     if (b.state === 'queued') bottom = `<span class="tier-badge" data-tier="queued">NEXT BAR</span>`;
     else if (b.state === 'clash') bottom = `<span class="tier-badge" data-tier="clash">⚠ CLASH</span>`;
     else if (locked && b.tier) bottom = `<span class="tier-badge" data-tier="${b.tier}">${TIER_LABEL[b.tier].split(' ')[0]} Anchor</span>`;
-    else if (b.tier && b.state === 'legal') bottom = `<span class="tier-badge" data-tier="${b.tier}" title="${esc(b.deviceLabel ?? '')}">${TIER_LABEL[b.tier]}</span>`;
+    else if (b.tier && b.state === 'legal') bottom = `<span class="tier-badge" data-tier="${b.tier}" title="${esc(b.deviceLabel ? `${b.deviceLabel}${b.devicePlain ? ` (${b.devicePlain})` : ''}` : '')}">${TIER_LABEL[b.tier]}</span>`;
     const label = locked ? 'ANCHOR' : `BAR ${i + 1}`;
     const aria = `Bar ${i + 1}: ${shown ? shown.symbol : 'empty'}${b.state === 'clash' ? ', clashing' : ''}${locked ? ', anchored' : ''}`;
     return `<button type="button" class="bar-slot${selected ? ' is-selected' : ''}" role="tab" aria-selected="${selected}" aria-label="${esc(aria)}"

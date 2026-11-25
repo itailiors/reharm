@@ -1,7 +1,7 @@
 import type {
   BadgeId, BarIndex, MelodyNote, ScoreBreakdown, SpiceTier, UnlockedBadge,
 } from '../types';
-import { type ProgressionAnalysis, analyzeProgression, rarityScore, tierRank } from './analysis';
+import { DEVICE_PLAIN, type ProgressionAnalysis, analyzeProgression, rarityScore, tierRank } from './analysis';
 import {
   type Chord, bassPc, chordPcs, hasInterval, isDominant, makeChord, typeBySuffix, chordTypeFor,
 } from './chords';
@@ -172,9 +172,10 @@ export function scoreProgression(ctx: PuzzleContext, chords: readonly Chord[]): 
   // Summaries
   const ranked = [...analysis.devices].sort((a, b) => tierRank(b.tier) - tierRank(a.tier));
   const labels = [...new Set(ranked.map((d) => d.label))].slice(0, 2);
+  const plain = ranked[0] ? ` — ${DEVICE_PLAIN[ranked[0].kind]}` : '';
   const raritySummary = labels.length
-    ? labels.join(' + ') + (rar.penalty ? ` · −${rar.penalty} unresolved` : '')
-    : rar.penalty ? `No functional devices · −${rar.penalty} for unresolved chromatic chords` : 'Diatonic colour without a named cadence';
+    ? labels.join(' + ') + plain + (rar.penalty ? ` · −${rar.penalty} unresolved` : '')
+    : rar.penalty ? `No functional devices · −${rar.penalty} for unresolved chromatic chords` : 'In-key chords, but no named move between them yet';
   const best = [...moments].sort((a, b) => b.points - a.points)[0];
   const melodySummary = best
     ? `Melody ${pcName(best.note.midi)} lands on the ${intervalRole(best.chord, best.note.midi)} of ${best.chord.symbol}`
@@ -320,7 +321,7 @@ export function evaluateBar(
       ? ` creates ${intervalRole(chord, best.n.midi)} tension over ${pcName(best.n.midi)} melody`
       : ` holds ${pcName(best.n.midi)} melody as the ${intervalRole(chord, best.n.midi)}`
     : '';
-  const device = ba.deviceLabel ? ` · ${ba.deviceLabel}` : '';
+  const device = ba.deviceLabel ? ` · ${ba.deviceLabel}${ba.devicePlain ? ` (${ba.devicePlain})` : ''}` : '';
   return {
     state: 'legal',
     tier: ba.tier,
