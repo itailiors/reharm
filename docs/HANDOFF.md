@@ -16,12 +16,12 @@ Production REHARM daily web game (Vite + vanilla TS + Tone.js), built strictly f
 - `tests/solver.ts` = brute-force helpers for bank checks.
 
 ## In progress
-Deploy is not live. To go live: enable Pages with Source = "GitHub Actions" (Settings → Pages), then push. The repo is private, so Pages needs a paid GitHub plan, or the repo must be made public (step 3).
+Nothing. LIVE at https://itailiors.github.io/reharm/ (repo made public 2026-11-25, Pages source = GitHub Actions; every push to main redeploys). First deploy run 45671548615 green; absolute og tags and og-image.png (200) checked live.
 
 ## Next 3 steps
-1. Enable Pages + push (user decision: public repo vs paid plan). Then check the live URL on mobile and the link preview.
-2. Test on a real iPhone with the silent switch on (audioSession + silent loop + Tone.start path); the only untested area. Easiest once the Pages URL is live.
-3. Optional: tune the percentile curve with real data later; custom domain → its SITE_URL is the Pages base_url automatically.
+1. Test on a real iPhone with the silent switch on via the live URL (audioSession + silent loop + Tone.start path); the only untested area.
+2. Check the link preview (paste the URL into iMessage/Discord) and the share flow from the live site.
+3. Housekeeping: bump configure-pages/deploy-pages when Node 24 versions ship (runs warn about Node 20); tune the percentile curve with real data later.
 
 ## Decisions + why
 - Vanilla TS over React: smallest bundle for mobile Safari (JS 94 KB gz, mostly Tone).
