@@ -22,7 +22,7 @@ Nothing. LIVE at https://itailiors.github.io/reharm/ (repo made public 2026-11-2
 
 ## Next 3 steps
 1. Test on a real iPhone with the silent switch on via the live URL (audioSession + silent loop + Tone.start path); the only untested area. Also paste the URL into iMessage/Discord/WhatsApp to see the real preview (can't be checked from here).
-2. og-image.png is 851 KB; WhatsApp often drops preview images over ~300–600 KB. If its preview is missing, export a compressed copy (JPEG/optimized PNG, same art and dimensions) and point the vite ogImage plugin at it.
+2. Share card now ships as og-image.jpg (74 KB, q88 JPEG of the 851 KB og-image.png master) so WhatsApp previews it. If the art changes, re-export the JPEG from the PNG.
 3. Housekeeping: bump configure-pages/deploy-pages when Node 24 versions ship (runs warn about Node 20); tune the percentile curve with real data later.
 
 ## Decisions + why
@@ -42,7 +42,7 @@ Nothing. LIVE at https://itailiors.github.io/reharm/ (repo made public 2026-11-2
 - renderOled replaces `#oled-screen` children, so `#playhead-beam` id no longer exists (query `.playhead-beam`).
 - Dev preview: `.claude/launch.json` "reharm-dev" on port 5173.
 - `vite.config.ts` is outside tsconfig `include`, so the IDE flags node:fs/process there; `npm run check` is unaffected.
-- The og:image rewrite matches the exact `<meta property="og:image" content="og-image.png" />` line in index.html; keep it if you edit that tag.
+- The og:image rewrite matches the exact `<meta property="og:image" content="og-image.jpg" />` line in index.html; keep it if you edit that tag.
 
 ## Suggested skills
 - `ship` for commit + push after changes.

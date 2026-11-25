@@ -3,7 +3,11 @@ import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
-/** Emits the social share card at a stable, un-hashed path so og:image can point at it. */
+/**
+ * Emits the social share card at a stable, un-hashed path so og:image can point at it.
+ * Ships the JPEG export (~75 KB) of assets/brand/og-image.png (the 851 KB design master):
+ * WhatsApp drops preview images over roughly 300–600 KB.
+ */
 function ogImage(): Plugin {
   return {
     name: 'reharm-og-image',
@@ -11,8 +15,8 @@ function ogImage(): Plugin {
     generateBundle() {
       this.emitFile({
         type: 'asset',
-        fileName: 'og-image.png',
-        source: readFileSync(fileURLToPath(new URL('./assets/brand/og-image.png', import.meta.url))),
+        fileName: 'og-image.jpg',
+        source: readFileSync(fileURLToPath(new URL('./assets/brand/og-image.jpg', import.meta.url))),
       });
     },
   };
@@ -31,8 +35,8 @@ function absoluteOgUrls(siteUrl: string | undefined): Plugin {
       if (!siteUrl) return html;
       const base = siteUrl.endsWith('/') ? siteUrl : `${siteUrl}/`;
       return html.replace(
-        '<meta property="og:image" content="og-image.png" />',
-        `<meta property="og:image" content="${base}og-image.png" />\n  <meta property="og:url" content="${base}" />`,
+        '<meta property="og:image" content="og-image.jpg" />',
+        `<meta property="og:image" content="${base}og-image.jpg" />\n  <meta property="og:url" content="${base}" />`,
       );
     },
   };
