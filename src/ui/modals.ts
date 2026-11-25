@@ -248,7 +248,7 @@ export class Modals {
         <h2 id="howto-title" class="modal-title" style="margin:0;">How to Play in 15 Seconds</h2>
         ${closeBtn('modal-howto')}
       </div>
-      ${step(1, 'Listen &amp; Pick a Bar', `Bar ${lock} is brass-locked as today’s anchor. Tap Play to loop the melody while you experiment.`)}
+      ${step(1, 'Listen &amp; Pick a Bar', `Bar ${lock} is today’s fixed <strong>Anchor</strong> chord; you fill the other three. Tap Play to loop the melody while you experiment.`)}
       ${step(2, 'Drop Chords with 2 Taps (or Piano)', 'Pick Root + Quality for the open bars. Need training wheels? Toggle <strong>Helper</strong> for teal dots on consonant chords.')}
       ${step(3, 'Chase Rare Harmony', 'Every legal harmony passes — rarer functional moves (tritone subs, borrowed chords) climb the Spice Tiers and unlock collectible pins.')}
       <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:6px;">

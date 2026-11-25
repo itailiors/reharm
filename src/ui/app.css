@@ -118,6 +118,46 @@ button.puzzle-pill.is-solved:hover {
   flex-shrink: 0;
 }
 
+/* Narrow phones: "Pause" + "View Score" leave no room for a one-line "86 BPM", so stack it. */
+@media (max-width: 420px) {
+  .bpm-readout {
+    width: min-content;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.05;
+    font-size: 10px;
+    padding: 0 5px;
+    flex-shrink: 0;
+  }
+}
+
+/* 320–360px phones: no room at all; BPM is still shown on the start screen. */
+@media (max-width: 360px) {
+  .bpm-readout {
+    display: none;
+  }
+}
+
+/* Phones: give the piano readout its own line so the held notes / hint aren't cut off. */
+@media (max-width: 767px) {
+  .piano-header-strip {
+    flex-wrap: wrap;
+    padding-block: 6px;
+  }
+
+  .piano-readout {
+    flex-basis: 100%;
+  }
+
+  .piano-notes-list {
+    white-space: normal;
+  }
+
+  .piano-actions {
+    margin-left: auto;
+  }
+}
+
 /* Score reveal */
 .reveal-strip {
   display: flex;
@@ -209,7 +249,9 @@ button.trophy-cell {
 }
 
 .trophy-hint {
-  min-height: 18px;
+  /* Two lines reserved so a wrapping pin hint doesn't shift the modal. */
+  min-height: 2.9em;
+  line-height: 1.45;
   font-size: 11px;
   color: var(--text-muted);
 }

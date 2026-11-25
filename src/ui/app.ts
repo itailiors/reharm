@@ -111,6 +111,8 @@ export class ReharmApp implements ReharmVisualHooks {
   readonly modals: Modals;
   readonly receiver: Receiver;
   view: 'studio' | 'receiver' = 'studio';
+  /** Feedback line to show once the audio gate closes (e.g. a bad shared link). */
+  private gateNotice: string | null = null;
 
   constructor() {
     this.settings = this.store.loadSettings();
@@ -153,7 +155,8 @@ export class ReharmApp implements ReharmVisualHooks {
     if (initial) {
       if (location.hash.length > 1) {
         history.replaceState(null, '', location.pathname + location.search);
-        this.setFeedback('info', 'That shared link did not match a released puzzle — here is today’s.');
+        // The gate buttons overwrite the feedback line, so show this once the gate closes.
+        this.gateNotice = 'That shared link was invalid or for an unreleased puzzle — here is today’s.';
       }
       this.showGate();
     }
@@ -181,6 +184,10 @@ export class ReharmApp implements ReharmVisualHooks {
   }
 
   private afterGate(): void {
+    if (this.gateNotice) {
+      this.setFeedback('info', this.gateNotice);
+      this.gateNotice = null;
+    }
     if (!this.meta.seenHowTo) {
       this.meta.seenHowTo = true;
       this.store.saveMeta(this.meta);
@@ -709,7 +716,12 @@ export class ReharmApp implements ReharmVisualHooks {
     $('#slash-current-label').textContent = bass ? `/${bass}` : 'Root';
     chips.innerHTML = [null, ...NOTE_NAMES].map((n) => `<button type="button" class="slash-chip" data-bass="${n ?? ''}" aria-pressed="${n === bass}"${disabled}>${n ? `/${n}` : 'None'}</button>`).join('');
 
-    const drawer = $('#panel-palette');
+    this.renderLockedNote('#panel-palette');
+  }
+
+  /** Disabled inputs on a locked day explain themselves (palette and piano alike). */
+  private renderLockedNote(panel: string): void {
+    const drawer = $(panel);
     drawer.querySelector('.drawer-locked-note')?.remove();
     if (!this.canEdit) {
       drawer.insertAdjacentHTML('afterbegin', `<div class="drawer-locked-note">Mix locked for today — Puzzle #${this.puzzle.puzzleNumber + 1} drops at 00:00 UTC. Tap <strong>View Score</strong> to share.</div>`);
@@ -754,6 +766,7 @@ export class ReharmApp implements ReharmVisualHooks {
         return `<button type="button" class="black-key" data-midi="${k.midi}" data-consonant="${safe.has(k.midi)}" aria-pressed="${this.piano.has(k.midi)}" aria-label="${midiLabel(k.midi)}" style="left:calc(6px + (100% - 12px) * ${ratio.toFixed(6)} - 15px)"${disabled}><span class="piano-helper-dot"></span><span>${pcName(k.midi)}</span></button>`;
       }).join('');
     this.updatePianoReadout();
+    this.renderLockedNote('#panel-piano');
   }
 
   private updatePianoReadout(): void {
