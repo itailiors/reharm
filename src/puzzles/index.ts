@@ -16,7 +16,7 @@ export interface BankEntry {
 
 export const PUZZLE_BANK: readonly BankEntry[] = (bankJson as { puzzles: BankEntry[] }).puzzles;
 
-/** Puzzle #1 launches on this UTC date. */
+/** Puzzle #1 is this calendar date (each player's local day). */
 export const EPOCH_ISO = '2026-11-25';
 const DAY_MS = 86_400_000;
 const EPOCH_MS = Date.parse(`${EPOCH_ISO}T00:00:00Z`);
@@ -125,12 +125,18 @@ export function bankIndexFor(puzzleNumber: number, bankSize = PUZZLE_BANK.length
 
 export const utcDateISO = (d: Date): string => d.toISOString().slice(0, 10);
 
+/**
+ * Puzzle number for the player's LOCAL calendar date (rolls over at local midnight, like the
+ * Reharm Daily hub). Counting calendar days via Date.UTC on the local Y/M/D keeps DST-length
+ * days from skewing the count.
+ */
 export function puzzleNumberForDate(d: Date): number {
-  const dayStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  const dayStart = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
   return Math.max(1, Math.floor((dayStart - EPOCH_MS) / DAY_MS) + 1);
 }
 
-export const dateISOForPuzzle = (n: number): string => utcDateISO(new Date(EPOCH_MS + (n - 1) * DAY_MS));
+/** Calendar date (YYYY-MM-DD) a puzzle number belongs to. */
+export const dateISOForPuzzle =(n: number): string => utcDateISO(new Date(EPOCH_MS + (n - 1) * DAY_MS));
 
 const cache = new Map<number, DailyPuzzle>();
 
