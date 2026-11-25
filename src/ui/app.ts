@@ -602,6 +602,11 @@ export class ReharmApp implements ReharmVisualHooks {
     pill.classList.toggle('is-solved', Boolean(this.solved));
     pill.title = this.solved ? 'Share today’s mix' : `Puzzle #${p.puzzleNumber}`;
     $('#bpm-readout').textContent = `${p.bpm} BPM`;
+    // Reharm Daily strip: REHARM is the only live daily, so today's sheet is 1 puzzle.
+    const done = this.solved ? 1 : 0;
+    $('#daily-mini-count').textContent = `${done}/1 today`;
+    $('#daily-mini-dot').classList.toggle('is-done', done === 1);
+    $('#daily-ritual-mini').setAttribute('aria-label', `Daily progress: ${done} of 1 puzzles played`);
   }
 
   renderSlots(): void {
