@@ -3,6 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request: # check/build only; the deploy job below never runs on PRs
   workflow_dispatch:
 
 permissions:
@@ -10,9 +11,11 @@ permissions:
   pages: write
   id-token: write
 
+# PR runs get their own group (cancelled when superseded) so they can never
+# displace a queued deploy.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.ref) || 'pages' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -36,6 +39,7 @@ jobs:
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
