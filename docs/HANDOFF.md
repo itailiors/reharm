@@ -18,9 +18,11 @@ Production REHARM daily web game (Vite + vanilla TS + Tone.js), built strictly f
 ## In progress
 Nothing. LIVE at https://itailiors.github.io/reharm/ (repo made public 2026-11-25, Pages source = GitHub Actions; every push to main redeploys). First deploy run 45671548615 green; absolute og tags and og-image.png (200) checked live.
 
+- Live share flow checked 2026-11-25 (in-app browser): fill → Lock Mix → Share card links to itailiors.github.io/reharm/#1:…; opening that link shows the receiver (spoiler-safe, A/B) with no console errors. Live og/twitter tags complete; og-image.png served as image/png.
+
 ## Next 3 steps
-1. Test on a real iPhone with the silent switch on via the live URL (audioSession + silent loop + Tone.start path); the only untested area.
-2. Check the link preview (paste the URL into iMessage/Discord) and the share flow from the live site.
+1. Test on a real iPhone with the silent switch on via the live URL (audioSession + silent loop + Tone.start path); the only untested area. Also paste the URL into iMessage/Discord/WhatsApp to see the real preview (can't be checked from here).
+2. og-image.png is 851 KB; WhatsApp often drops preview images over ~300–600 KB. If its preview is missing, export a compressed copy (JPEG/optimized PNG, same art and dimensions) and point the vite ogImage plugin at it.
 3. Housekeeping: bump configure-pages/deploy-pages when Node 24 versions ship (runs warn about Node 20); tune the percentile curve with real data later.
 
 ## Decisions + why
