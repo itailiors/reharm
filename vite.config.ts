@@ -3,21 +3,25 @@ import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
-/**
- * Emits the social share card at a stable, un-hashed path so og:image can point at it.
- * Ships the JPEG export (~75 KB) of assets/brand/og-image.png (the 851 KB design master):
- * WhatsApp drops preview images over roughly 300–600 KB.
- */
-function ogImage(): Plugin {
+/** dist path → source path. Emitted un-hashed because crawlers and the manifest need stable URLs. */
+const STATIC_FILES: Record<string, string> = {
+  // JPEG export (~75 KB) of assets/brand/og-image.png (851 KB master): WhatsApp drops previews over ~300–600 KB.
+  'og-image.jpg': './assets/brand/og-image.jpg',
+  'manifest.webmanifest': './assets/brand/manifest.webmanifest',
+  'icons/icon-192.png': './assets/brand/icons/icon-192.png',
+  'icons/icon-512.png': './assets/brand/icons/icon-512.png',
+  'icons/icon-maskable-512.png': './assets/brand/icons/icon-maskable-512.png',
+};
+
+function staticFiles(): Plugin {
   return {
-    name: 'reharm-og-image',
+    name: 'reharm-static-files',
     apply: 'build',
     generateBundle() {
-      this.emitFile({
-        type: 'asset',
-        fileName: 'og-image.jpg',
-        source: readFileSync(fileURLToPath(new URL('./assets/brand/og-image.jpg', import.meta.url))),
-      });
+      for (const [fileName, src] of Object.entries(STATIC_FILES)) {
+        this.emitFile({ type: 'asset', fileName, source: readFileSync(fileURLToPath(new URL(src, import.meta.url))) });
+      }
+      this.emitFile({ type: 'asset', fileName: 'robots.txt', source: 'User-agent: *\nAllow: /\n' });
     },
   };
 }
@@ -34,10 +38,12 @@ function absoluteOgUrls(siteUrl: string | undefined): Plugin {
     transformIndexHtml(html) {
       if (!siteUrl) return html;
       const base = siteUrl.endsWith('/') ? siteUrl : `${siteUrl}/`;
-      return html.replace(
-        '<meta property="og:image" content="og-image.jpg" />',
-        `<meta property="og:image" content="${base}og-image.jpg" />\n  <meta property="og:url" content="${base}" />`,
-      );
+      return html
+        .replace(
+          '<meta property="og:image" content="og-image.jpg" />',
+          `<meta property="og:image" content="${base}og-image.jpg" />\n  <meta property="og:url" content="${base}" />`,
+        )
+        .replace('<meta name="twitter:image" content="og-image.jpg" />', `<meta name="twitter:image" content="${base}og-image.jpg" />`);
     },
   };
 }
@@ -45,7 +51,7 @@ function absoluteOgUrls(siteUrl: string | undefined): Plugin {
 export default defineConfig({
   base: './',
   publicDir: false,
-  plugins: [ogImage(), absoluteOgUrls(process.env.SITE_URL)],
+  plugins: [staticFiles(), absoluteOgUrls(process.env.SITE_URL)],
   build: {
     target: 'es2020',
     assetsInlineLimit: 0,

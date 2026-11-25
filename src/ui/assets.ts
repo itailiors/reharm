@@ -4,14 +4,15 @@ import type { BadgeId } from '../types';
 import logoUrl from '../../assets/brand/logo.svg';
 import faviconUrl from '../../assets/brand/favicon.svg';
 
-import tritoneSub from '../../assets/badges/tritone-sub.png';
-import backdoorDominant from '../../assets/badges/backdoor-dominant.png';
-import modalBorrow from '../../assets/badges/modal-borrow.png';
-import chromaticMediant from '../../assets/badges/chromatic-mediant.png';
-import sharp11Melody from '../../assets/badges/sharp11-melody.png';
-import smoothBass from '../../assets/badges/smooth-bass.png';
-import radioSafe from '../../assets/badges/radio-safe.png';
-import jazzTrench from '../../assets/badges/jazz-trench.png';
+// 132px (3× the 44px display size) exports of the 512px masters in assets/badges/ (~18 KB vs ~350 KB each).
+import tritoneSub from '../../assets/badges/web/tritone-sub.png';
+import backdoorDominant from '../../assets/badges/web/backdoor-dominant.png';
+import modalBorrow from '../../assets/badges/web/modal-borrow.png';
+import chromaticMediant from '../../assets/badges/web/chromatic-mediant.png';
+import sharp11Melody from '../../assets/badges/web/sharp11-melody.png';
+import smoothBass from '../../assets/badges/web/smooth-bass.png';
+import radioSafe from '../../assets/badges/web/radio-safe.png';
+import jazzTrench from '../../assets/badges/web/jazz-trench.png';
 
 import tritoneSubSvg from '../../assets/badges/tritone-sub.svg';
 import backdoorDominantSvg from '../../assets/badges/backdoor-dominant.svg';
@@ -40,7 +41,7 @@ import stats from '../../assets/icons/stats.svg?raw';
 
 export const BRAND = { logo: logoUrl, favicon: faviconUrl };
 
-/** 512px enamel pin PNGs (lazy-loaded inside modals). */
+/** 132px enamel pin PNGs (lazy-loaded inside modals). */
 export const BADGE_PNG: Record<BadgeId, string> = {
   'tritone-sub': tritoneSub,
   'backdoor-dominant': backdoorDominant,
