@@ -208,7 +208,7 @@ export class Modals {
         ${closeBtn('modal-share')}
       </div>
       <div class="share-preview-box" id="share-card-text">${esc(payload.emojiCardText)}</div>
-      <p class="share-footnote">Your chord names live only in the link — safe to paste in Discord without spoiling!</p>
+      <p class="share-footnote">The card shows no chord names. Your chords are inside the link itself, so anyone who reads the URL can see them; friends who just tap it get a spoiler-safe view until they play.</p>
       <div style="display:flex; flex-direction:column; gap:8px;">
         <button class="cta-primary" type="button" id="btn-copy-card" style="height:48px;">Copy Playable Link &amp; Card</button>
         <button class="hw-btn" type="button" id="btn-copy-link-only">Copy Link Only</button>
