@@ -1,0 +1,309 @@
+/* =========================================================================
+   Production glue on top of the prototype stylesheet (styles.css).
+   Token-only: no new colours, fonts, radii or easings.
+   ========================================================================= */
+
+.workspace-studio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.drawer-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.icon-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-slot svg,
+.seg-btn .icon-slot svg,
+.helper-toggle .icon-slot svg {
+  width: 15px;
+  height: 15px;
+}
+
+.hw-btn .icon-slot svg {
+  width: 17px;
+  height: 17px;
+}
+
+.cta-primary svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.icon-btn svg,
+.icon-btn .icon-slot svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* The empty/legal state borders would otherwise override the selected ring. */
+.bar-slot.is-selected[data-slot-state="empty"],
+.bar-slot.is-selected[data-slot-state="legal"] {
+  border: 2px solid var(--accent-primary);
+  box-shadow: var(--glow-amber), var(--shadow-keycap);
+}
+
+.bar-slot.is-selected[data-slot-state="clash"],
+.bar-slot.is-selected[data-slot-state="queued"] {
+  box-shadow: var(--glow-amber);
+}
+
+button.puzzle-pill {
+  cursor: default;
+}
+
+button.puzzle-pill.is-solved {
+  cursor: pointer;
+  border-color: var(--accent-primary);
+}
+
+button.puzzle-pill.is-solved:hover {
+  background: var(--accent-primary-soft);
+}
+
+.puzzle-pill .solved-score {
+  color: var(--state-legal-fg);
+}
+
+.bar-slot[aria-disabled="true"]:not([data-slot-state="locked"]) {
+  cursor: default;
+}
+
+.bar-slot.anim-brass-blink {
+  animation: reharm-brass-blink var(--dur-smooth) var(--ease-out);
+}
+
+@keyframes reharm-brass-blink {
+  0%, 100% { box-shadow: var(--shadow-keycap); }
+  50% { box-shadow: var(--glow-brass), var(--shadow-keycap); }
+}
+
+.beat-led.is-remaining {
+  background: var(--state-queued-fg);
+}
+
+.keycap-btn:disabled,
+.slash-chip:disabled,
+.white-key:disabled,
+.black-key:disabled,
+.mini-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.mini-btn.is-primary:disabled {
+  box-shadow: none;
+}
+
+.drawer-locked-note {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-well);
+  border: 1px solid var(--border-subtle);
+}
+
+.piano-tier {
+  flex-shrink: 0;
+}
+
+/* Score reveal */
+.reveal-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.reveal-strip .mono {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-play {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mini-play svg {
+  width: 14px;
+  height: 14px;
+}
+
+.rank-pill[data-tier="radio-safe"] { background: var(--tier-safe-bg); border-color: var(--tier-safe-border); color: var(--tier-safe-fg); }
+.rank-pill[data-tier="jazz-standard"] { background: var(--tier-jazz-bg); border-color: var(--tier-jazz-border); color: var(--tier-jazz-fg); }
+.rank-pill[data-tier="modal-interchange"] { background: var(--tier-modal-bg); border-color: var(--tier-modal-border); color: var(--tier-modal-fg); }
+
+.rank-pill.anim-pop {
+  animation: reharm-badge-stamp var(--dur-normal) var(--ease-spring) backwards;
+}
+
+.reveal-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.reveal-actions .cta-primary {
+  flex: 1;
+}
+
+.empty-pins {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-well);
+  border: 1px dashed var(--border-strong);
+}
+
+/* Share */
+.cta-primary.is-copied,
+.hw-btn.is-copied {
+  background: var(--state-legal-bg);
+  border: 1px solid var(--state-legal-border);
+  color: var(--state-legal-fg);
+  box-shadow: none;
+}
+
+.share-footnote {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Stats */
+.meter-row.is-today .meter-head span:first-child {
+  color: var(--accent-primary);
+}
+
+.meter-row.is-today .meter-track {
+  border-color: var(--accent-primary);
+  box-shadow: var(--glow-amber);
+}
+
+button.trophy-cell {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.trophy-hint {
+  min-height: 18px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Receiver */
+.receiver-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.receiver-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.compare-delta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.compare-head {
+  display: grid;
+  grid-template-columns: 52px 1fr 1fr;
+  gap: 6px;
+  padding: 0 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.compare-row .chord-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+.compare-row .chord-cell .mono {
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.receiver-card .bar-slot {
+  cursor: default;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 5px;
+  background: var(--border-strong);
+  vertical-align: middle;
+}
+
+.status-dot.is-ready {
+  background: var(--state-legal-fg);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rank-pill.anim-pop,
+  .bar-slot.anim-brass-blink {
+    animation: none !important;
+  }
+}
+
+[data-reduced-motion="true"] .rank-pill.anim-pop,
+[data-reduced-motion="true"] .bar-slot.anim-brass-blink,
+[data-reduced-motion="true"] .badge-item.anim-stamp {
+  animation: none !important;
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-reduced-motion="false">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#111215" />
+  <meta name="description" content="REHARM — one daily 4-bar melody. Craft the rarest chord progression underneath and share a playable link." />
+  <title>REHARM — Daily Reharmonization Studio</title>
+  <meta property="og:title" content="REHARM — Daily Reharmonization Studio" />
+  <meta property="og:description" content="Four bars. One melody. Endless harmony." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/assets/brand/favicon.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <main class="app-shell">
+    <!-- Top Header -->
+    <header class="studio-header">
+      <div class="brand-lockup">
+        <img class="brand-mark" id="brand-mark" alt="REHARM mark" width="28" height="28" />
+        <span class="brand-wordmark">REHARM</span>
+        <button class="puzzle-pill" id="puzzle-pill" type="button" disabled></button>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btn-open-howto" type="button" aria-label="How to Play" title="How to Play" data-icon="info"></button>
+        <button class="icon-btn" id="btn-open-stats" type="button" aria-label="Stats &amp; Badges" title="Stats &amp; Badges" data-icon="stats"></button>
+        <button class="icon-btn" id="btn-open-settings" type="button" aria-label="Settings" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.82-.33 1.7 1.7 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1-1.51 1.7 1.7 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .33-1.82 1.7 1.7 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.51-1 1.7 1.7 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.82.33H9a1.7 1.7 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.51 1.7 1.7 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Active Studio Workspace (Views 2, 3, 4) -->
+    <section id="workspace-studio" class="workspace-studio">
+      <section class="timeline-module" aria-label="4-Bar Melody and Chord Timeline">
+        <div class="oled-screen" id="oled-screen">
+          <div class="oled-grid" id="oled-grid"></div>
+          <div class="oled-notes-layer" id="oled-notes-layer"></div>
+          <div class="playhead-beam" id="playhead-beam"></div>
+        </div>
+        <div class="chord-slots-grid" id="chord-slots-grid" role="tablist" aria-label="4 Chord Bars"></div>
+      </section>
+
+      <div class="feedback-strip" id="feedback-strip" aria-live="polite">
+        <div class="feedback-msg" id="feedback-msg"></div>
+        <div class="feedback-fixes" id="feedback-fixes"></div>
+      </div>
+
+      <div class="transport-bar">
+        <div class="transport-left">
+          <button class="hw-btn" id="btn-play-toggle" type="button" aria-pressed="false" aria-label="Play loop">
+            <span class="icon-slot" id="icon-play-state" data-icon="play"></span>
+            <span id="txt-play-state">Play</span>
+          </button>
+          <button class="hw-btn is-on" id="btn-loop-toggle" type="button" aria-pressed="true" aria-label="Loop playback" title="Loop 4 Bars" data-icon="loop"></button>
+          <button class="hw-btn" id="btn-reset-bars" type="button" aria-label="Undo last change (hold to reset Bars)" title="Undo · hold to reset" data-icon="undo-reset"></button>
+          <span class="bpm-readout" id="bpm-readout"></span>
+        </div>
+        <button class="cta-primary" id="btn-lock-mix" type="button" disabled title="Fill all 4 bars cleanly to lock">
+          <span id="txt-lock-mix">Lock Mix</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+      </div>
+
+      <section class="input-drawer" id="input-drawer" data-helper="true" aria-label="Chord Input Drawer">
+        <div class="drawer-toolbar">
+          <div class="segmented-switch" role="tablist" aria-label="Input mode">
+            <button class="seg-btn" id="tab-palette" type="button" role="tab" aria-selected="true"><span class="icon-slot" data-icon="grid-palette"></span>Palette</button>
+            <button class="seg-btn" id="tab-piano" type="button" role="tab" aria-selected="false"><span class="icon-slot" data-icon="piano-keys"></span>Piano</button>
+          </div>
+          <span class="editing-badge" id="editing-badge"></span>
+          <button class="helper-toggle" id="btn-helper-toggle" type="button" aria-pressed="true"><span class="icon-slot" data-icon="helper-bulb"></span>Helper<span class="helper-pip"></span></button>
+        </div>
+
+        <div id="panel-palette" class="drawer-panel">
+          <div>
+            <div class="palette-section-label">
+              <span>1 · Root Note</span>
+              <span id="helper-legend-note" style="color:var(--tier-safe-fg);">● Teal = Consonant Helper</span>
+            </div>
+            <div class="roots-grid" id="roots-grid"></div>
+          </div>
+          <div>
+            <div class="palette-section-label">
+              <span>2 · Chord Quality</span>
+              <span class="mono" id="palette-preview-chord"></span>
+            </div>
+            <div class="qualities-grid" id="qualities-grid"></div>
+          </div>
+          <div class="slash-row">
+            <button class="slash-trigger" id="btn-toggle-slash" type="button" aria-expanded="false">/ Bass <span id="slash-current-label" style="color:var(--text-muted)">Root</span></button>
+            <div class="slash-chips" id="slash-chips" hidden></div>
+          </div>
+        </div>
+
+        <div id="panel-piano" class="drawer-panel" hidden>
+          <div class="piano-header-strip">
+            <div class="piano-readout">
+              <span class="piano-chord-guess" id="piano-chord-guess"></span>
+              <span class="piano-notes-list" id="piano-notes-list"></span>
+            </div>
+            <div class="piano-actions">
+              <button class="mini-btn" id="btn-piano-clear" type="button">Clear</button>
+              <button class="mini-btn is-primary" id="btn-piano-apply" type="button">Apply</button>
+            </div>
+          </div>
+          <div class="piano-scroller">
+            <div class="piano-bed" id="piano-bed" aria-label="1.5 Octave Sticky Piano Keyboard"></div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- View 7: Shared-Mix Receiver Screen -->
+    <section id="workspace-receiver" class="receiver-card" hidden aria-label="Shared Friend Mix Receiver"></section>
+  </main>
+
+  <!-- View 1: Tactile iOS Audio Unlock Gate -->
+  <div class="modal-backdrop gate-backdrop" id="modal-gate" hidden role="dialog" aria-modal="true" aria-labelledby="gate-title">
+    <div class="modal-card gate-card">
+      <div class="gate-logo-dark-fix">
+        <img class="gate-logo-img" id="gate-logo" alt="REHARM" />
+      </div>
+      <span class="puzzle-pill" id="gate-edition"></span>
+      <h1 id="gate-title" class="display" style="margin:0; font-size:22px; line-height:1.2;">Four bars. One melody.<br />Build the rarest mix.</h1>
+      <p style="margin:0; font-size:13px; color:var(--text-secondary);">One daily 4-bar melody. Craft the rarest progression underneath.</p>
+      <button class="gate-power-btn" id="btn-power-studio" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+        TAP TO POWER STUDIO
+      </button>
+      <div class="gate-ios-hint">Routes warm Rhodes synth to media audio — works even on silent switch</div>
+      <button class="ghost-link" id="btn-continue-muted" type="button">Continue visually (muted)</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-reveal" hidden role="dialog" aria-modal="true" aria-labelledby="reveal-title"></div>
+  <div class="modal-backdrop" id="modal-share" hidden role="dialog" aria-modal="true" aria-labelledby="share-title"></div>
+  <div class="modal-backdrop" id="modal-howto" hidden role="dialog" aria-modal="true" aria-labelledby="howto-title"></div>
+  <div class="modal-backdrop" id="modal-stats" hidden role="dialog" aria-modal="true" aria-labelledby="stats-title"></div>
+  <div class="modal-backdrop" id="modal-settings" hidden role="dialog" aria-modal="true" aria-labelledby="settings-title"></div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
