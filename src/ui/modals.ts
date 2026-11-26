@@ -142,7 +142,7 @@ export class Modals {
       <aside class="daily-next-card" aria-label="Next daily puzzle">
         <div class="daily-next-info">
           <span class="daily-next-eyebrow">Today’s Sheet</span>
-          <strong class="daily-next-title">All daily puzzles complete</strong>
+          <strong class="daily-next-title">REHARM done · more puzzles on the sheet</strong>
           <a class="daily-next-practice" href="${LAB_CHANGES_URL}">Practice: Make the&nbsp;Changes&nbsp;↗</a>
         </div>
         <a class="daily-next-cta" href="${DAILY_SHARE_URL}">Share Combined Card →</a>

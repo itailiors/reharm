@@ -6,12 +6,12 @@ import type { Voicing } from '../theory';
 import type { UserSettings } from '../types';
 
 export type ChordStyle = UserSettings['chordStyle'];
-export const CHORD_STYLES: { id: ChordStyle; label: string }[] = [
-  { id: 'block', label: 'Block' },
-  { id: 'arpeggio', label: 'Arpeggio' },
-  { id: 'outside-in', label: 'Outside-in' },
-  { id: 'random', label: 'Random' },
-  { id: 'bach', label: 'Bach' },
+export const CHORD_STYLES: { id: ChordStyle; label: string; hint: string }[] = [
+  { id: 'block', label: 'Block', hint: 'all notes held together for the whole bar' },
+  { id: 'arpeggio', label: 'Arpeggio', hint: 'notes one at a time, up then back down' },
+  { id: 'outside-in', label: 'Outside-in', hint: 'lowest, highest, then working toward the middle' },
+  { id: 'random', label: 'Random', hint: 'the chord’s notes in a shuffled order' },
+  { id: 'bach', label: 'Bach', hint: 'low notes held, upper notes broken in quick 16ths, like a Bach prelude' },
 ];
 
 export interface PatternNote {

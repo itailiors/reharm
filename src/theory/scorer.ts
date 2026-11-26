@@ -154,6 +154,21 @@ export interface FullScore extends ScoreBreakdown {
   barTiers: SpiceTier[];
 }
 
+/**
+ * Names the bars behind a rarity penalty, e.g. "−12: Cø7 (Bar 2) and Db7#11 (Bar 3) are outside the key
+ * with no move in or out (−6 each)". A bare "−12 unresolved" left players guessing which bar to fix.
+ */
+function penaltyDetail(chords: readonly Chord[], analysis: ProgressionAnalysis, total: number): string {
+  const name = (i: number) => `${chords[i]!.symbol} (Bar ${i + 1})`;
+  const list = (xs: number[]) => (xs.length > 1 ? `${xs.slice(0, -1).map(name).join(', ')} and ${name(xs[xs.length - 1]!)}` : name(xs[0]!));
+  const outside = analysis.bars.flatMap((b, i) => (b?.unexplainedChromatic ? [i] : []));
+  const loose = analysis.bars.flatMap((b, i) => (b?.unresolvedDominant ? [i] : []));
+  const parts: string[] = [];
+  if (outside.length) parts.push(`${list(outside)} ${outside.length > 1 ? 'are' : 'is'} outside the key with no move in or out (−6${outside.length > 1 ? ' each' : ''})`);
+  if (loose.length) parts.push(`${list(loose)} never resolve${loose.length > 1 ? '' : 's'} (−3${loose.length > 1 ? ' each' : ''})`);
+  return `−${total}: ${parts.join('; ')}`;
+}
+
 /** Krillion-style 3-axis score for a complete 4-bar progression. */
 export function scoreProgression(ctx: PuzzleContext, chords: readonly Chord[]): FullScore {
   if (chords.length !== 4) throw new Error('scoreProgression expects 4 chords');
@@ -173,9 +188,10 @@ export function scoreProgression(ctx: PuzzleContext, chords: readonly Chord[]): 
   const ranked = [...analysis.devices].sort((a, b) => tierRank(b.tier) - tierRank(a.tier));
   const labels = [...new Set(ranked.map((d) => d.label))].slice(0, 2);
   const plain = ranked[0] ? ` — ${DEVICE_PLAIN[ranked[0].kind]}` : '';
+  const penalty = rar.penalty ? penaltyDetail(chords, analysis, rar.penalty) : '';
   const raritySummary = labels.length
-    ? labels.join(' + ') + plain + (rar.penalty ? ` · −${rar.penalty} unresolved` : '')
-    : rar.penalty ? `No functional devices · −${rar.penalty} for unresolved chromatic chords` : 'In-key chords, but no named move between them yet';
+    ? labels.join(' + ') + plain + (penalty ? ` · ${penalty}` : '')
+    : penalty ? `No functional devices · ${penalty}` : 'In-key chords, but no named move between them yet';
   const best = [...moments].sort((a, b) => b.points - a.points)[0];
   const melodySummary = best
     ? `Melody ${pcName(best.note.midi)} lands on the ${intervalRole(best.chord, best.note.midi)} of ${best.chord.symbol}`

@@ -5,7 +5,7 @@ import {
   type Chord, DEVICE_PLAIN, analyzeProgression, colorize, evaluateBar, makeChord, parseChord, percentileFor, rarityScore,
   scoreProgression, suggestFixes, tierForTotal, typeBySuffix, barNotes, findClashes,
 } from '../src/theory';
-import { type BankEntry, PUZZLE_BANK, buildPuzzle, mulberry32 } from '../src/puzzles';
+import { type BankEntry, PUZZLE_BANK, buildPuzzle, getPuzzleByNumber, mulberry32 } from '../src/puzzles';
 import { ctxFor } from './solver';
 
 const C = (s: string): Chord => {
@@ -89,7 +89,13 @@ describe('anti-cheese: rarity is coupled to functional resolutions', () => {
     const s = score(p, ['CMaj7', 'Dbdim7', 'Gb7alt', 'Eaug']);
     expect(s.rarity).toBe(0);
     expect(s.total).toBeLessThan(60);
-    expect(s.axisSummaries.rarity).toMatch(/unresolved/);
+    expect(s.axisSummaries.rarity).toMatch(/−\d+: .*\(Bar \d\)/);
+  });
+
+  it('names the bars behind a rarity penalty (playtest: "−12 unresolved" gave no fix)', () => {
+    const p = getPuzzleByNumber(3);
+    const s = scoreProgression(ctxFor(p), ['EbMaj7', 'Cø7', 'Db7#11', 'E7alt'].map(C));
+    expect(s.axisSummaries.rarity).toContain('−12: Cø7 (Bar 2) and Db7#11 (Bar 3) are outside the key with no move in or out (−6 each)');
   });
 
   it('the same altered dominant earns Deep points only when it resolves', () => {

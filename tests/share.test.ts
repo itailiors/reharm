@@ -80,7 +80,7 @@ describe('share card', () => {
     expect(lines[1]).toBe('Bar 1 🔒 | Bar 2 🟣 | Bar 3 🔥 | Bar 4 ✨');
     expect(lines[2]).toBe('Badges: 🌙 Modal Borrow · ⚡ Tritone Sub · 💎 #11 Melody');
     expect(lines[3]).toBe('Bassline Flow: 🌊 Flowing (3 st avg)');
-    expect(lines[4]).toBe('▶ Hear my mix: reharm.app/#42:CMaj7.AbMaj7.Db7s11.CMaj9');
+    expect(lines[4]).toBe('▶ Hear my mix: https://reharm.app/#42:CMaj7.AbMaj7.Db7s11.CMaj9');
     expect(lines.slice(0, 4).join('\n')).not.toContain('Db7');
     expect(p.barTiers[0]).toBe('locked');
     expect(displayUrl('http://x.y/#1:C.C.C.C')).toBe('x.y/#1:C.C.C.C');

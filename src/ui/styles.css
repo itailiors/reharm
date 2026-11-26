@@ -274,8 +274,10 @@
       box-shadow: var(--glow-amber);
     }
 
+    /* Always shown (pitch class only, to fit phones): playtesters couldn't read the melody without names. */
     .melody-pill-label {
-      display: none;
+      display: block;
+      white-space: nowrap;
       position: absolute;
       top: -14px;
       left: 2px;
@@ -285,12 +287,9 @@
       pointer-events: none;
     }
 
-    @media (min-width: 768px) {
-      .melody-pill:hover .melody-pill-label,
-      .melody-pill[data-sounding="true"] .melody-pill-label {
-        display: block;
-        color: var(--accent-primary);
-      }
+    .melody-pill:hover .melody-pill-label,
+    .melody-pill[data-sounding="true"] .melody-pill-label {
+      color: var(--accent-primary);
     }
 
     /* Animated Playhead */

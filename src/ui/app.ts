@@ -1,10 +1,10 @@
 import type {
-  BarIndex, ChordQuality, DailyPuzzle, NoteName, ReharmVisualHooks, SlotLifecycleState, SpiceTier, UserSettings,
+  BarIndex, ChordQuality, DailyPuzzle, MelodyNote, NoteName, ReharmVisualHooks, SlotLifecycleState, SpiceTier, UserSettings,
 } from '../types';
 import { BAR_INDICES } from '../types';
 import {
   type Chord, type FullScore, type PuzzleContext, type Voicing, NOTE_NAMES, PALETTE_QUALITIES, TIER_LABEL,
-  analyzeProgression, barNotes, colorize, evaluateBar, midiLabel, paletteChord, parseChord, pcName,
+  analyzeProgression, barNotes, chordPcs, colorize, evaluateBar, midiLabel, paletteChord, parseChord, pcName, relToRoot,
   recognizeChord, safeQualitiesForRoot, scoreProgression, voiceChord,
 } from '../theory';
 import { getPuzzleByNumber, puzzleKey, puzzleNumberForDate } from '../puzzles';
@@ -55,6 +55,23 @@ const LOCK_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 export const shortKey = (p: DailyPuzzle): string =>
   `${p.tonic ?? p.keyLabel.split(' ')[0]} ${p.mode === 'minor' ? 'MIN' : 'MAJ'}`;
 
+const TENSION_NAME: Record<number, string> = { 1: 'b9', 2: '9', 3: '#9', 5: '11', 6: '#11', 8: 'b13', 9: '13' };
+
+/**
+ * When colorize() renames a palette pick (Db + 7 under a held G -> Db7#11), say why, so the
+ * chord doesn't look silently swapped. Returns "" when nothing changed.
+ */
+export function extensionNote(plain: Chord, shown: Chord, notes: readonly MelodyNote[]): string {
+  if (plain.symbol === shown.symbol) return '';
+  const base = chordPcs(plain);
+  const added = chordPcs(shown);
+  const tensions = [...new Set(notes.map((n) => n.midi % 12))]
+    .filter((pc) => !base.has(pc) && added.has(pc))
+    .map((pc) => `${pcName(pc)} (${TENSION_NAME[relToRoot(plain, pc)] ?? 'colour'})`);
+  if (!tensions.length) return '';
+  return `${plain.symbol} + melody ${tensions.join(', ')} = ${shown.symbol}. `;
+}
+
 /** Chord tones in voicing order for the desktop slot readout ("C E G B"). */
 export function chordToneNames(chord: Chord): string {
   const names: string[] = chord.type.intervals.map((i) => pcName(chord.root + i));
@@ -76,7 +93,7 @@ export function renderOled(container: HTMLElement, puzzle: DailyPuzzle): Surface
     el.style.left = `${((n.barIndex * 4 + n.startBeat) / 16) * 100}%`;
     el.style.width = `${(n.durationBeats / 16) * 100}%`;
     el.style.top = `${(1 - n.yNorm) * 76 + 6}%`;
-    el.innerHTML = `<span class="melody-pill-label">${esc(n.pitchLabel)}</span>`;
+    el.innerHTML = `<span class="melody-pill-label">${esc(n.pitchLabel.replace(/-?\d+$/, ''))}</span>`;
     el.title = n.pitchLabel;
     layer.appendChild(el);
     pills.set(n.id, el);
@@ -322,7 +339,7 @@ export class ReharmApp implements ReharmVisualHooks {
     if (!box) return;
     if (!box.childElementCount) {
       box.innerHTML = CHORD_STYLES.map((s) =>
-        `<button class="style-chip" type="button" role="radio" data-style="${s.id}">${esc(s.label)}</button>`).join('');
+        `<button class="style-chip" type="button" role="radio" data-style="${s.id}" title="${esc(s.hint)}">${esc(s.label)}</button>`).join('');
     }
     $$<HTMLButtonElement>('.style-chip', box).forEach((b) => b.setAttribute('aria-checked', String(b.dataset.style === this.settings.chordStyle)));
   }
@@ -341,6 +358,8 @@ export class ReharmApp implements ReharmVisualHooks {
   /** Pick a chord style from the studio strip; while paused, audition it (playing: it lands on the next bar). */
   pickChordStyle(style: ChordStyle): void {
     this.updateSettings({ chordStyle: style });
+    const meta = CHORD_STYLES.find((s) => s.id === style);
+    if (meta && !this.solved) this.setFeedback('info', `${meta.label} style: ${meta.hint}. Sound only, it doesn't change your score.`);
     this.audition(() => {
       const v = this.voicings[this.selectedBar] ?? this.voicings.find(Boolean);
       if (v) this.engine.previewPattern(v, style);
@@ -443,7 +462,7 @@ export class ReharmApp implements ReharmVisualHooks {
   }
 
   /** Apply a chord to a bar: clash shake, or queue to the next barline while looping, else snap legal. */
-  applyChord(bar: BarIndex, chord: Chord, custom: number[] | null = null, autoAdvance = false): void {
+  applyChord(bar: BarIndex, chord: Chord, custom: number[] | null = null, autoAdvance = false, note = ''): void {
     if (!this.canEdit || bar === this.puzzle.lockedBarIndex) return;
     this.pushUndo();
     const b = this.bars[bar]!;
@@ -472,7 +491,7 @@ export class ReharmApp implements ReharmVisualHooks {
       this.renderTransport();
       this.onChordSwap(bar, 'legal', b.tier);
       const fresh = evaluateBar(this.ctx, this.committedChords(), bar, chord);
-      this.setFeedback('legal', fresh.message);
+      this.setFeedback('legal', `${note}${fresh.message}`);
       this.saveDraft();
     };
     b.queued = chord;
@@ -482,7 +501,7 @@ export class ReharmApp implements ReharmVisualHooks {
       this.renderSlots();
       this.renderTransport();
       this.onChordSwap(bar, 'queued');
-      this.setFeedback('queued', `Next bar: ${chord.symbol} → Bar ${bar + 1} on the downbeat…`);
+      this.setFeedback('queued', `${note}Next bar: ${chord.symbol} → Bar ${bar + 1} on the downbeat…`);
     }
     if (autoAdvance && wasEmpty) {
       const next = BAR_INDICES.find((i) => i !== this.puzzle.lockedBarIndex && this.bars[i]!.state === 'empty');
@@ -690,11 +709,10 @@ export class ReharmApp implements ReharmVisualHooks {
     pill.classList.toggle('is-solved', Boolean(this.solved));
     pill.title = this.solved ? 'Share today’s mix' : `Puzzle #${p.puzzleNumber}`;
     $('#bpm-readout').textContent = `${p.bpm} BPM`;
-    // Reharm Daily strip: REHARM is the only live daily, so today's sheet is 1 puzzle.
-    const done = this.solved ? 1 : 0;
-    $('#daily-mini-count').textContent = `${done}/1 today`;
-    $('#daily-mini-dot').classList.toggle('is-done', done === 1);
-    $('#daily-ritual-mini').setAttribute('aria-label', `Daily progress: ${done} of 1 puzzles played`);
+    // Reharm Daily strip: REHARM only knows its own result ("1/1 today" read as the whole sheet being done).
+    $('#daily-mini-count').textContent = this.solved ? 'REHARM done' : 'Daily sheet';
+    $('#daily-mini-dot').classList.toggle('is-done', Boolean(this.solved));
+    $('#daily-ritual-mini').setAttribute('aria-label', `${this.solved ? 'REHARM done today. ' : ''}Open today's Reharm Daily sheet`);
   }
 
   renderSlots(): void {
@@ -804,6 +822,11 @@ export class ReharmApp implements ReharmVisualHooks {
     const { root, quality, bass } = this.palette;
     $('#palette-preview-chord').textContent = root && quality ? colorize(paletteChord(root, quality, bass), notes).symbol : root ? `${root} …` : '';
 
+    // A locked day hides the / Bass row: it stayed tappable after locking and pushed the page past 844px.
+    const slashRow = $('#btn-toggle-slash').closest<HTMLElement>('.slash-row');
+    if (slashRow) slashRow.hidden = !this.canEdit;
+    $<HTMLButtonElement>('#btn-toggle-slash').disabled = !this.canEdit;
+    if (!this.canEdit) this.slashOpen = false;
     const chips = $('#slash-chips');
     chips.hidden = !this.slashOpen;
     $('#btn-toggle-slash').setAttribute('aria-expanded', String(this.slashOpen));
@@ -845,8 +868,10 @@ export class ReharmApp implements ReharmVisualHooks {
     const { root, quality, bass } = this.palette;
     if (!root || !quality) return;
     const bar = this.selectedBar;
-    const chord = colorize(paletteChord(root, quality, bass), barNotes(this.puzzle.melody, bar));
-    this.applyChord(bar, chord, null, true);
+    const notes = barNotes(this.puzzle.melody, bar);
+    const plain = paletteChord(root, quality, bass);
+    const chord = colorize(plain, notes);
+    this.applyChord(bar, chord, null, true, extensionNote(plain, chord, notes));
   }
 
   private renderPiano(): void {

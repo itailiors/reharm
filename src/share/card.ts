@@ -41,7 +41,8 @@ export function buildSharePayload(args: {
     bars,
     badgeLine,
     `Bassline Flow: ${flow.emoji} ${flow.word} (${score.avgBassSemitones} st avg)`,
-    `▶ Hear my mix: ${displayUrl(url)}`,
+    // Full URL: without https:// some chat apps don't make it a link.
+    `▶ Hear my mix: ${url}`,
   ];
   return {
     puzzleNumber,
