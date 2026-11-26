@@ -359,7 +359,9 @@ export class ReharmApp implements ReharmVisualHooks {
   pickChordStyle(style: ChordStyle): void {
     this.updateSettings({ chordStyle: style });
     const meta = CHORD_STYLES.find((s) => s.id === style);
-    if (meta && !this.solved) this.setFeedback('info', `${meta.label} style: ${meta.hint}. Sound only, it doesn't change your score.`);
+    // Never over a clash: setFeedback would wipe its one-tap fix chips.
+    const clashing = this.bars.some((b) => b.state === 'clash');
+    if (meta && !this.solved && !clashing) this.setFeedback('info', `${meta.label} style: ${meta.hint}. Sound only, it doesn't change your score.`);
     this.audition(() => {
       const v = this.voicings[this.selectedBar] ?? this.voicings.find(Boolean);
       if (v) this.engine.previewPattern(v, style);
