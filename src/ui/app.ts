@@ -143,7 +143,8 @@ export class ReharmApp implements ReharmVisualHooks {
 
   private routeFromHash(initial = false): void {
     const decoded = location.hash.length > 1 ? decodeMix(location.hash) : null;
-    if (decoded && decoded.puzzleNumber <= this.todayNumber) {
+    // +1: puzzles roll over at local midnight, so a sender a few time zones ahead can be a day on.
+    if (decoded && decoded.puzzleNumber <= this.todayNumber + 1) {
       const puzzle = getPuzzleByNumber(decoded.puzzleNumber);
       if (decoded.symbols[puzzle.lockedBarIndex] === puzzle.anchorChord.symbol) {
         this.modals.closeAll(true);
@@ -255,7 +256,7 @@ export class ReharmApp implements ReharmVisualHooks {
     this.engine.setProgression(this.voicings);
     this.renderAll();
     requestAnimationFrame(() => this.measure());
-    if (this.solved) this.setFeedback('legal', `✓ Mix locked · ${this.solved.total}/100 · ${this.solved.percentileLabel}. New melody at 00:00 UTC.`);
+    if (this.solved) this.setFeedback('legal', `✓ Mix locked · ${this.solved.total}/100 · ${this.solved.percentileLabel}. New melody at midnight.`);
     else this.setFeedback('info', `Bar ${p.lockedBarIndex + 1} is anchored on ${p.anchorChord.symbol}. Pick a bar, then Root + Quality.`);
   }
 
@@ -731,7 +732,7 @@ export class ReharmApp implements ReharmVisualHooks {
     const drawer = $(panel);
     drawer.querySelector('.drawer-locked-note')?.remove();
     if (!this.canEdit) {
-      drawer.insertAdjacentHTML('afterbegin', `<div class="drawer-locked-note">Mix locked for today — Puzzle #${this.puzzle.puzzleNumber + 1} drops at 00:00 UTC. Tap <strong>View Score</strong> to share.</div>`);
+      drawer.insertAdjacentHTML('afterbegin', `<div class="drawer-locked-note">Mix locked for today — Puzzle #${this.puzzle.puzzleNumber + 1} drops at midnight. Tap <strong>View Score</strong> to share.</div>`);
     }
   }
 

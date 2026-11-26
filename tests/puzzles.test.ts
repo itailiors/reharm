@@ -85,26 +85,32 @@ function pairArr(i: number, j: number, a: Chord, b: Chord): (Chord | null)[] {
   return arr;
 }
 
-describe('deterministic UTC daily selector', () => {
+// `new Date(y, monthIndex, d, h, min)` is LOCAL time, so these hold in any test-runner time zone.
+describe('deterministic local-date daily selector', () => {
   it('numbers puzzles from the launch epoch', () => {
-    expect(puzzleNumberForDate(new Date(`${EPOCH_ISO}T00:00:00Z`))).toBe(1);
-    expect(puzzleNumberForDate(new Date(`${EPOCH_ISO}T23:59:59Z`))).toBe(1);
-    expect(puzzleNumberForDate(new Date('2026-11-26T00:00:00Z'))).toBe(2);
-    expect(puzzleNumberForDate(new Date('2027-01-05T12:00:00Z'))).toBe(42);
-    expect(puzzleNumberForDate(new Date('2020-01-01T00:00:00Z'))).toBe(1);
+    expect(EPOCH_ISO).toBe('2026-11-25');
+    expect(puzzleNumberForDate(new Date(2026, 10, 25, 0, 0))).toBe(1);
+    expect(puzzleNumberForDate(new Date(2026, 10, 25, 23, 59, 59))).toBe(1);
+    expect(puzzleNumberForDate(new Date(2026, 10, 26, 0, 0))).toBe(2);
+    expect(puzzleNumberForDate(new Date(2027, 0, 5, 12, 0))).toBe(42);
+    expect(puzzleNumberForDate(new Date(2020, 0, 1))).toBe(1);
     expect(dateISOForPuzzle(42)).toBe('2027-01-05');
   });
 
-  it('uses UTC, not local time', () => {
-    // Same instant expressed with different offsets maps to the same puzzle
-    const a = new Date('2026-12-01T23:30:00-05:00'); // = 2026-12-02 04:30Z
-    const b = new Date('2026-12-02T04:30:00Z');
-    expect(puzzleNumberForDate(a)).toBe(puzzleNumberForDate(b));
+  it('rolls over at local midnight, not UTC midnight', () => {
+    expect(puzzleNumberForDate(new Date(2026, 11, 1, 23, 59))).toBe(7);
+    expect(puzzleNumberForDate(new Date(2026, 11, 2, 0, 1))).toBe(8);
+  });
+
+  it('counts calendar days across DST changes', () => {
+    // Spring-forward / fall-back days are 23h / 25h in many zones; the count must not drift.
+    expect(puzzleNumberForDate(new Date(2027, 2, 29, 12)) - puzzleNumberForDate(new Date(2027, 2, 27, 12))).toBe(2);
+    expect(puzzleNumberForDate(new Date(2027, 10, 8, 0, 30)) - puzzleNumberForDate(new Date(2027, 10, 6, 23, 30))).toBe(2);
   });
 
   it('is deterministic', () => {
-    const d = new Date('2027-03-14T09:00:00Z');
-    expect(getDailyPuzzle(d).bankId).toBe(getDailyPuzzle(new Date('2027-03-14T22:00:00Z')).bankId);
+    const d = new Date(2027, 2, 14, 0, 5);
+    expect(getDailyPuzzle(d).bankId).toBe(getDailyPuzzle(new Date(2027, 2, 14, 23, 55)).bankId);
     expect(getPuzzleByNumber(42).puzzleNumber).toBe(42);
     expect(getPuzzleByNumber(42).dateISO).toBe('2027-01-05');
     expect(bankIndexFor(77)).toBe(bankIndexFor(77));

@@ -1,8 +1,8 @@
 /**
  * Reharm Daily hub record (`daily:v1:reharm`).
  * Contract: ReharmLab-Dailys/design/data-contract.md §1; parsed by the hub's src/lib/records.ts.
- * The hub rolls over at LOCAL midnight, so `dateKey` is the local calendar date even though
- * REHARM itself numbers puzzles by UTC day.
+ * The hub rolls over at LOCAL midnight; `dateKey` is the local calendar date, the same day
+ * REHARM's puzzle number is derived from.
  */
 import type { BadgeId, PlayerStats, SpiceTier } from '../types';
 import type { HistoryEntry } from './storage';
@@ -107,7 +107,7 @@ export function buildProgressRecord(puzzleNo: number, filled: number, stats: Lif
 
 /**
  * Whether `next` may replace `prev`. A finished local day never regresses to in_progress/new:
- * REHARM's UTC rollover can serve a new puzzle while the hub's local day already shows "done".
+ * Guards edge cases such as a device clock / time-zone change mid-day serving a new puzzle.
  */
 export function shouldReplace(prev: Partial<DailyRecord> | null, next: DailyRecord): boolean {
   if (next.status === 'done') return true;
