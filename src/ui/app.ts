@@ -9,6 +9,10 @@ import {
 } from '../theory';
 import { getPuzzleByNumber, puzzleKey, puzzleNumberForDate } from '../puzzles';
 import { ReharmAudioEngine } from '../audio/engine';
+import { buildMidi } from '../audio/midi';
+import { PIANOS } from '../audio/pianos';
+import { LEADS } from '../audio/leads';
+import { CHORD_STYLES, type ChordStyle } from '../audio/patterns';
 import { decodeMix } from '../share/codec';
 import { type HistoryEntry, type MetaState, ReharmStore, browserKV } from '../share/storage';
 import { $, $$, esc, replayClass } from './dom';
@@ -121,6 +125,9 @@ export class ReharmApp implements ReharmVisualHooks {
     this.applySettings();
     this.engine = new ReharmAudioEngine(this);
     this.engine.setMuted(this.settings.isMuted);
+    this.engine.setPiano(this.settings.piano);
+    this.engine.setChordStyle(this.settings.chordStyle);
+    this.engine.setMelodyTone(this.settings.melodyTone);
     this.engine.onStop(() => this.onStopped());
     this.todayNumber = puzzleNumberForDate(new Date());
     this.modals = new Modals(this);
@@ -289,8 +296,88 @@ export class ReharmApp implements ReharmVisualHooks {
     this.store.saveSettings(this.settings);
     this.applySettings();
     if ('isMuted' in patch) this.engine.setMuted(this.settings.isMuted);
+    if ('piano' in patch) this.engine.setPiano(this.settings.piano);
+    if ('chordStyle' in patch) this.engine.setChordStyle(this.settings.chordStyle);
+    if ('melodyTone' in patch) this.engine.setMelodyTone(this.settings.melodyTone);
     this.renderDrawer();
+    this.renderStyleStrip();
     this.modals.refreshSettings();
+  }
+
+  /** Play the selected bar's chord (or a Cmaj7) once so a new keys sound can be heard while paused. */
+  auditionChord(): void {
+    if (this.engine.isPlaying) return;
+    const v = this.voicings[this.selectedBar] ?? this.voicings.find(Boolean);
+    this.engine.previewNotes(v ? v.upper : [60, 64, 67, 71]);
+  }
+
+  /** Play the first notes of today's melody so a new melody sound can be heard while paused. */
+  auditionMelody(): void {
+    this.engine.previewLead(this.puzzle.melody.slice(0, 3).map((n) => n.midi));
+  }
+
+  /** Studio chord-style chips (same setting as the Settings row). */
+  renderStyleStrip(): void {
+    const box = document.getElementById('style-strip-chips');
+    if (!box) return;
+    if (!box.childElementCount) {
+      box.innerHTML = CHORD_STYLES.map((s) =>
+        `<button class="style-chip" type="button" role="radio" data-style="${s.id}">${esc(s.label)}</button>`).join('');
+    }
+    $$<HTMLButtonElement>('.style-chip', box).forEach((b) => b.setAttribute('aria-checked', String(b.dataset.style === this.settings.chordStyle)));
+  }
+
+  /**
+   * Play a sound-choice audition from a tap. Never in Muted Mode: waking audio there would start
+   * the iOS media session (pausing the player's other audio) and restart the visual loop.
+   */
+  audition(play: () => void): void {
+    if (this.settings.isMuted || this.engine.isPlaying) return;
+    void this.ensureAudio().then((ok) => {
+      if (ok) play();
+    });
+  }
+
+  /** Pick a chord style from the studio strip; while paused, audition it (playing: it lands on the next bar). */
+  pickChordStyle(style: ChordStyle): void {
+    this.updateSettings({ chordStyle: style });
+    this.audition(() => {
+      const v = this.voicings[this.selectedBar] ?? this.voicings.find(Boolean);
+      if (v) this.engine.previewPattern(v, style);
+    });
+  }
+
+  /** The mix a MIDI export should contain: the friend's/your shared mix in the receiver, else the studio bars. */
+  private midiMix(): { puzzle: DailyPuzzle; voicings: readonly (Voicing | null)[] } {
+    return (this.view === 'receiver' ? this.receiver.currentMix() : null) ?? { puzzle: this.puzzle, voicings: this.voicings };
+  }
+
+  /** True when at least one bar has a chord to export. */
+  hasMidiContent(): boolean {
+    return this.midiMix().voicings.some(Boolean);
+  }
+
+  /** Save the 4-bar loop (melody, chords in the current style, bass) as a .mid file. */
+  downloadMidi(): void {
+    const { puzzle: p, voicings } = this.midiMix();
+    const bytes = buildMidi({
+      bpm: p.bpm,
+      melody: p.melody,
+      voicings,
+      style: this.settings.chordStyle,
+      seed: p.puzzleNumber,
+      keysProgram: PIANOS[this.settings.piano]?.gmProgram,
+      melodyProgram: LEADS[this.settings.melodyTone]?.gmProgram,
+    });
+    const url = URL.createObjectURL(new Blob([bytes], { type: 'audio/midi' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reharm-${p.puzzleNumber}-${this.settings.chordStyle}.mid`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Safari (iOS) starts the download asynchronously, after its own prompt: keep the URL alive.
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
   }
 
   // ---------------------------------------------------------------------------
@@ -870,6 +957,11 @@ export class ReharmApp implements ReharmVisualHooks {
     });
 
     $('#btn-lock-mix').addEventListener('click', () => this.lockMix());
+    this.renderStyleStrip();
+    $('#style-strip-chips').addEventListener('click', (e) => {
+      const chip = (e.target as HTMLElement).closest<HTMLElement>('[data-style]');
+      if (chip) this.pickChordStyle(chip.dataset.style as ChordStyle);
+    });
     $('#puzzle-pill').addEventListener('click', () => {
       if (this.solved) this.modals.openShare(this.scoreFor(this.solved.symbols));
     });

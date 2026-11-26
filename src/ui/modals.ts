@@ -1,4 +1,7 @@
-import type { BadgeId, SpiceTier, UnlockedBadge } from '../types';
+import type { BadgeId, SpiceTier, UnlockedBadge, UserSettings } from '../types';
+import { CHORD_STYLES } from '../audio/patterns';
+import { PIANOS, PIANO_IDS } from '../audio/pianos';
+import { LEADS, LEAD_IDS } from '../audio/leads';
 import { BADGE_IDS } from '../types';
 import { BADGE_META, type FullScore, tierForTotal } from '../theory';
 import { buildSharePayload } from '../share/card';
@@ -134,6 +137,7 @@ export class Modals {
         <button class="cta-primary" type="button" id="btn-reveal-share">${ICONS.share} Share Mix</button>
         <button class="hw-btn" type="button" id="btn-reveal-replay" aria-label="Replay Mix" title="Replay Mix">${ICONS.play}<span class="reveal-btn-label"> Replay Mix</span></button>
         <button class="hw-btn" type="button" id="btn-reveal-stats" aria-label="View Stats" title="View Stats">${ICONS.stats}<span class="reveal-btn-label"> View Stats</span></button>
+        <button class="hw-btn" type="button" id="btn-reveal-midi" aria-label="Download MIDI" title="Download MIDI">${ICONS.download}<span class="reveal-btn-label"> MIDI</span></button>
       </div>
       <aside class="daily-next-card" aria-label="Next daily puzzle">
         <div class="daily-next-info">
@@ -147,6 +151,7 @@ export class Modals {
 
     $('#btn-reveal-share', el).addEventListener('click', () => this.openShare(score));
     $('#btn-reveal-stats', el).addEventListener('click', () => this.openStats());
+    $('#btn-reveal-midi', el).addEventListener('click', () => app.downloadMidi());
     const replay = () => {
       if (!app.engine.isPlaying) app.togglePlay();
     };
@@ -335,7 +340,26 @@ export class Modals {
       <div id="settings-rows"></div>`);
     this.renderSettingsRows(el);
     $('#settings-rows', el).addEventListener('click', (e) => {
-      const sw = (e.target as HTMLElement).closest<HTMLElement>('[data-setting]');
+      const t = e.target as HTMLElement;
+      if (t.closest('#btn-settings-midi')) {
+        this.app.downloadMidi();
+        return;
+      }
+      const choice = t.closest<HTMLElement>('[data-choice]');
+      if (choice) {
+        const { choice: key, value } = choice.dataset;
+        if (key === 'piano') {
+          this.app.updateSettings({ piano: value as UserSettings['piano'] });
+          this.app.audition(() => this.app.auditionChord());
+        } else if (key === 'melodyTone') {
+          this.app.updateSettings({ melodyTone: value as UserSettings['melodyTone'] });
+          this.app.audition(() => this.app.auditionMelody());
+        } else if (key === 'chordStyle') {
+          this.app.updateSettings({ chordStyle: value as UserSettings['chordStyle'] });
+        }
+        return;
+      }
+      const sw = t.closest<HTMLElement>('[data-setting]');
       if (!sw) return;
       const s = this.app.settings;
       switch (sw.dataset.setting) {
@@ -371,10 +395,33 @@ export class Modals {
     const audioStatus = `<span class="status-dot${ready && !s.isMuted ? ' is-ready' : ''}"></span>${
       ready ? (s.isMuted ? 'Muted · visual loop only' : 'Media Channel Ready') : 'Audio sleeping · unmute or Play to wake it'
     } · iPhone silent switch safe`;
+    const choices = (key: 'piano' | 'chordStyle' | 'melodyTone', title: string, sub: string, opts: { id: string; label: string }[], cur: string) => `
+      <div class="setting-row setting-choice" style="margin-bottom:8px;">
+        <div>
+          <div style="font-size:13px; font-weight:600;">${title}</div>
+          <div style="font-size:11px; color:var(--text-muted);">${sub}</div>
+        </div>
+        <div class="segmented-switch choice-switch" role="radiogroup" aria-label="${esc(title)}">${opts.map((o) => `
+          <button class="seg-btn" type="button" role="radio" data-choice="${key}" data-value="${o.id}" aria-checked="${o.id === cur}" aria-selected="${o.id === cur}">${esc(o.label)}</button>`).join('')}
+        </div>
+      </div>`;
+    const canExport = this.app.hasMidiContent();
     $('#settings-rows', el).innerHTML =
+      choices('piano', 'Keys Sound', 'The keyboard that plays your chords', PIANO_IDS.map((id) => PIANOS[id]), s.piano) +
+      choices('melodyTone', 'Melody Sound', 'The voice that plays the daily melody', LEAD_IDS.map((id) => LEADS[id]), s.melodyTone) +
+      choices('chordStyle', 'Chord Style', 'How each bar’s chord is played · next barline', CHORD_STYLES, s.chordStyle) +
+      `<div class="setting-row" style="margin-bottom:8px;">
+        <div>
+          <div style="font-size:13px; font-weight:600;">Download MIDI</div>
+          <div style="font-size:11px; color:var(--text-muted);">${canExport ? 'Melody, chords (in this style) &amp; bass · 4 bars' : 'Add a chord to a bar first'}</div>
+        </div>
+        <button class="hw-btn" type="button" id="btn-settings-midi"${canExport ? '' : ' disabled'}>${ICONS.download} .mid</button>
+      </div>` +
       row('theme', 'Daylight Theme (Light)', 'Warm studio newsprint vs Midnight obsidian', s.theme === 'light') +
       row('helper', 'Consonant Helper Dots', 'Show teal LEDs on diatonic chord &amp; piano options', s.consonantHelper) +
       row('muted', 'Muted Mode', audioStatus, s.isMuted) +
-      row('motion', 'Reduced Motion', 'Disables shake, pulse &amp; sweeping playhead beam', s.reducedMotion);
+      row('motion', 'Reduced Motion', 'Disables shake, pulse &amp; sweeping playhead beam', s.reducedMotion) +
+      `<p class="settings-credit">Piano, Rhodes, vibes &amp; flute samples: Fluid R3 GM SoundFont by Frank Wen,
+        <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC BY 3.0</a>.</p>`;
   }
 }
