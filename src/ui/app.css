@@ -474,8 +474,24 @@ button.trophy-cell {
   border-color: var(--bridge-accent);
 }
 
+/* Phones: Replay / Stats go icon-only so the reveal actions fit one row (keeps the modal unscrolled). */
+@media (max-width: 420px) {
+  .reveal-actions {
+    flex-wrap: nowrap;
+  }
+
+  .reveal-actions .hw-btn {
+    flex: none;
+    min-width: 44px;
+    justify-content: center;
+  }
+
+  .reveal-btn-label {
+    display: none;
+  }
+}
+
 .daily-next-card {
-  margin-top: 12px;
   padding: 12px;
   display: flex;
   align-items: center;
@@ -493,6 +509,17 @@ button.trophy-cell {
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+}
+
+/* Wider modals: keep the CTA beside the text (text may wrap) so the reveal modal stays unscrolled. */
+@media (min-width: 421px) {
+  .daily-next-card {
+    flex-wrap: nowrap;
+  }
+
+  .daily-next-info {
+    flex: 1 1 auto;
+  }
 }
 
 .daily-next-eyebrow {
@@ -539,4 +566,59 @@ button.trophy-cell {
 .daily-next-cta:focus-visible {
   outline: 2px solid var(--bridge-text);
   outline-offset: 2px;
+}
+
+/* "Learn <move> in Reharm Lab" chip (bridge-spec.md §3): Reharm Lab parchment in every theme. */
+.daily-lab-chip {
+  min-height: 48px;
+  padding: 6px 12px 6px 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #FBF3DF;
+  border: 1.8px solid #1E2A78;
+  border-radius: 12px;
+  color: #1E2A78;
+  text-decoration: none;
+}
+
+.daily-lab-chip:hover {
+  background: #F6EBCF;
+}
+
+.daily-lab-chip:focus-visible {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.daily-lab-mark {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid #1E2A78;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.daily-lab-title {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Kalam', var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.daily-lab-action {
+  flex: none;
+  color: #A52213;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
 }

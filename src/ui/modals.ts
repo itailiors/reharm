@@ -3,6 +3,7 @@ import { BADGE_IDS } from '../types';
 import { BADGE_META, type FullScore, tierForTotal } from '../theory';
 import { buildSharePayload } from '../share/card';
 import { DAILY_SHARE_URL, LAB_CHANGES_URL } from '../share/daily';
+import { labChipHtml } from './labChip';
 import { $, $$, copyText, esc, prefersReducedMotion } from './dom';
 import { BADGE_PNG, BADGE_SVG, ICONS } from './assets';
 import type { ReharmApp } from './app';
@@ -131,17 +132,18 @@ export class Modals {
       </div>
       <div class="reveal-actions">
         <button class="cta-primary" type="button" id="btn-reveal-share">${ICONS.share} Share Mix</button>
-        <button class="hw-btn" type="button" id="btn-reveal-replay">${ICONS.play} Replay Mix</button>
-        <button class="hw-btn" type="button" id="btn-reveal-stats">${ICONS.stats} View Stats</button>
+        <button class="hw-btn" type="button" id="btn-reveal-replay" aria-label="Replay Mix" title="Replay Mix">${ICONS.play}<span class="reveal-btn-label"> Replay Mix</span></button>
+        <button class="hw-btn" type="button" id="btn-reveal-stats" aria-label="View Stats" title="View Stats">${ICONS.stats}<span class="reveal-btn-label"> View Stats</span></button>
       </div>
       <aside class="daily-next-card" aria-label="Next daily puzzle">
         <div class="daily-next-info">
           <span class="daily-next-eyebrow">Today’s Sheet</span>
           <strong class="daily-next-title">All daily puzzles complete</strong>
-          <a class="daily-next-practice" href="${LAB_CHANGES_URL}">Practice: Make the Changes ↗</a>
+          <a class="daily-next-practice" href="${LAB_CHANGES_URL}">Practice: Make the&nbsp;Changes&nbsp;↗</a>
         </div>
         <a class="daily-next-cta" href="${DAILY_SHARE_URL}">Share Combined Card →</a>
-      </aside>`);
+      </aside>
+      ${labChipHtml(score.unlockedBadges.map((b) => b.id))}`);
 
     $('#btn-reveal-share', el).addEventListener('click', () => this.openShare(score));
     $('#btn-reveal-stats', el).addEventListener('click', () => this.openStats());
