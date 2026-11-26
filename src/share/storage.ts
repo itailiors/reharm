@@ -33,6 +33,9 @@ export const DEFAULT_SETTINGS: UserSettings = {
   isMuted: false,
   reducedMotion: false,
   inputMode: 'palette',
+  piano: 'rhodes',
+  chordStyle: 'outside-in',
+  melodyTone: 'flute',
 };
 
 const PREFIX = 'reharm:v1:';

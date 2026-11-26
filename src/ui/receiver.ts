@@ -124,11 +124,16 @@ export class Receiver {
     app.setPlayingUI(app.engine.toggle());
   }
 
-  private applySource(): void {
+  /** The mix currently loaded in the engine (for MIDI export while the receiver is open). */
+  currentMix(): { puzzle: DailyPuzzle; voicings: Voicing[] } | null {
     const s = this.st;
-    if (!s) return;
-    const v = s.source === 'yours' && s.mine ? s.mine.voicings : s.friend.voicings;
-    this.app.engine.setProgression(v);
+    if (!s) return null;
+    return { puzzle: s.puzzle, voicings: s.source === 'yours' && s.mine ? s.mine.voicings : s.friend.voicings };
+  }
+
+  private applySource(): void {
+    const mix = this.currentMix();
+    if (mix) this.app.engine.setProgression(mix.voicings);
   }
 
   private render(): void {

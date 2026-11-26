@@ -83,6 +83,8 @@ export const ICONS = {
   'undo-reset': strip(undoReset),
   info: strip(info),
   stats: strip(stats),
+  // Not in assets/icons: drawn to match the set's 2px round stroke.
+  download: '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><polyline points="7 10 12 15 17 10"/><path d="M5 20h14"/></svg>',
 } as const;
 
 export type IconName = keyof typeof ICONS;

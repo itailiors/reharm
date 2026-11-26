@@ -156,6 +156,12 @@ export interface UserSettings {
   isMuted: boolean;
   reducedMotion: boolean;
   inputMode: 'palette' | 'piano';
+  /** (impl) Keyboard sound. */
+  piano: 'rhodes' | 'grand' | 'felt' | 'wurli';
+  /** (impl) How each bar's chord is played. */
+  chordStyle: 'block' | 'arpeggio' | 'outside-in' | 'random' | 'bach';
+  /** (impl) Melody sound. */
+  melodyTone: 'bell' | 'vibes' | 'flute' | 'synth';
 }
 
 export interface ReharmVisualHooks {
